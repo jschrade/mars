@@ -2,16 +2,16 @@ import mock
 import numpy as np
 import pytest
 
-from mars_rover import Rover
+from mars_rover import Rover, ObstacleBlocking
 from mars_rover.rover import FORWARD, BACKWARD, LEFT, RIGHT
 
 
 @pytest.mark.unit
 def test_init(basic_terrain):
-    rover = Rover(basic_terrain, (0,0), Rover.NORTH)
+    rover = Rover(basic_terrain, (0, 0), Rover.NORTH)
 
     assert rover.terrain == basic_terrain
-    assert rover.location == (0,0)
+    assert rover.location == (0, 0)
     assert rover.direction == Rover.NORTH
 
 
@@ -79,7 +79,7 @@ def test__cmd_l(basic_rover):
 
 
 @pytest.mark.unit
-def test__cmd_l(basic_rover):
+def test__cmd_r(basic_rover):
     basic_rover._cmd_r()
     assert basic_rover.direction == Rover.EAST
 
@@ -93,3 +93,111 @@ def test__cmd_l(basic_rover):
     assert basic_rover.direction == Rover.NORTH
 
 
+@pytest.mark.unit
+def test__cmd_f(basic_rover):
+    basic_rover._cmd_f()
+    assert basic_rover.location == (1, 0)
+
+    basic_rover._cmd_f()
+    assert basic_rover.location == (0, 0)
+
+    basic_rover.direction = Rover.SOUTH
+
+    basic_rover._cmd_f()
+    assert basic_rover.location == (1, 0)
+
+    basic_rover._cmd_f()
+    assert basic_rover.location == (0, 0)
+
+    basic_rover.direction = Rover.WEST
+
+    basic_rover._cmd_f()
+    assert basic_rover.location == (0, 1)
+
+    basic_rover._cmd_f()
+    assert basic_rover.location == (0, 0)
+
+    basic_rover.direction = Rover.EAST
+
+    basic_rover._cmd_f()
+    assert basic_rover.location == (0, 1)
+
+    basic_rover._cmd_f()
+    assert basic_rover.location == (0, 0)
+
+
+@pytest.mark.unit
+def test__cmd_f_obstacle(obstacle_rover):
+    with pytest.raises(ObstacleBlocking):
+        obstacle_rover._cmd_f()
+
+
+@pytest.mark.unit
+def test__cmd_b(basic_rover):
+    basic_rover._cmd_b()
+    assert basic_rover.location == (1, 0)
+
+    basic_rover._cmd_b()
+    assert basic_rover.location == (0, 0)
+
+    basic_rover.direction = Rover.SOUTH
+
+    basic_rover._cmd_b()
+    assert basic_rover.location == (1, 0)
+
+    basic_rover._cmd_b()
+    assert basic_rover.location == (0, 0)
+
+    basic_rover.direction = Rover.WEST
+
+    basic_rover._cmd_b()
+    assert basic_rover.location == (0, 1)
+
+    basic_rover._cmd_b()
+    assert basic_rover.location == (0, 0)
+
+    basic_rover.direction = Rover.EAST
+
+    basic_rover._cmd_b()
+    assert basic_rover.location == (0, 1)
+
+    basic_rover._cmd_b()
+    assert basic_rover.location == (0, 0)
+
+
+@pytest.mark.unit
+def test__cmd_b_obstacle(obstacle_rover):
+    with pytest.raises(ObstacleBlocking):
+        obstacle_rover._cmd_b()
+
+
+@pytest.mark.integration
+def test_multi_move(basic_rover):
+    basic_rover.run_commands('r,f,r,f')
+
+    assert basic_rover.direction == Rover.SOUTH
+    assert basic_rover.location == (1, 1)
+
+    basic_rover.run_commands('r,r,f')
+
+    assert basic_rover.direction == Rover.NORTH
+    assert basic_rover.location == (0, 1)
+
+    basic_rover.run_commands('f,l,f')
+
+    assert basic_rover.direction == Rover.WEST
+    assert basic_rover.location == (1, 0)
+
+    basic_rover.run_commands('b,l,b')
+
+    assert basic_rover.direction == Rover.SOUTH
+    assert basic_rover.location == (0, 1)
+
+
+@pytest.mark.integration
+def test_multi_move_obstacle(obstacle_rover):
+    with pytest.raises(ObstacleBlocking):
+        obstacle_rover.run_commands('l,f,l,f,l,f')
+
+    assert obstacle_rover.direction == Rover.EAST
+    assert obstacle_rover.location == (1, 0)

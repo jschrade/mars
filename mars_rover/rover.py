@@ -20,7 +20,7 @@ class Rover(object):
 
     def __init__(self, terrain, location, direction):
         self.terrain = terrain
-        self.location = location
+        self.x, self.y = location
         self.direction = direction
 
     def _parse_commands(self, string_buffer):
@@ -34,11 +34,64 @@ class Rover(object):
     def _get_command_function(self, command):
         return getattr(self, '_cmd_{}'.format(command))
 
+    def _check_clear(self, location):
+        if not self.terrain.is_clear(location):
+                raise ObstacleBlocking()
+
     def _cmd_f(self):
-        pass
+        x = self.x
+        y = self.y
+
+        if self.direction == self.NORTH:
+            x -= 1
+        if self.direction == self.SOUTH:
+            x += 1
+        if self.direction == self.WEST:
+            y -= 1
+        if self.direction == self.EAST:
+            y += 1
+
+        if x < 0:
+            x = self.terrain.max_x
+        if x > self.terrain.max_x:
+            x = 0
+
+        if y < 0:
+            y = self.terrain.max_y
+        if y > self.terrain.max_y:
+            y = 0
+
+        location = (x, y)
+        self._check_clear(location)
+        self.x, self.y = location
+
 
     def _cmd_b(self):
-        pass
+        x = self.x
+        y = self.y
+
+        if self.direction == self.NORTH:
+            x += 1
+        if self.direction == self.SOUTH:
+            x -= 1
+        if self.direction == self.WEST:
+            y += 1
+        if self.direction == self.EAST:
+            y -= 1
+
+        if x < 0:
+            x = self.terrain.max_x
+        if x > self.terrain.max_x:
+            x = 0
+
+        if y < 0:
+            y = self.terrain.max_y
+        if y > self.terrain.max_y:
+            y = 0
+
+        location = (x, y)
+        self._check_clear(location)
+        self.x, self.y = location
 
     def _cmd_l(self):
         if self.direction == self.NORTH:
@@ -65,6 +118,10 @@ class Rover(object):
             return
         if self.direction == self.WEST:
             self.direction = self.NORTH
+
+    @property
+    def location(self):
+        return (self.x, self.y)
 
     def run_commands(self, string_buffer):
         commands = self._parse_commands(string_buffer)

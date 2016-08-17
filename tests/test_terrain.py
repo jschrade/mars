@@ -18,6 +18,16 @@ def test_init():
 
 
 @pytest.mark.unit
+def test_max_x(basic_terrain):
+    assert basic_terrain.max_x == 1
+
+
+@pytest.mark.unit
+def test_max_x(basic_terrain):
+    assert basic_terrain.max_y == 1
+
+
+@pytest.mark.unit
 def test_add_obstacle(basic_terrain):
     basic_terrain.add_obstacle((1,1))
 
