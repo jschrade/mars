@@ -1,0 +1,2 @@
+class ObstacleBlocking(Exception):
+    pass
