@@ -41,10 +41,30 @@ class Rover(object):
         pass
 
     def _cmd_l(self):
-        pass
+        if self.direction == self.NORTH:
+            self.direction = self.WEST
+            return
+        if self.direction == self.SOUTH:
+            self.direction = self.EAST
+            return
+        if self.direction == self.EAST:
+            self.direction = self.NORTH
+            return
+        if self.direction == self.WEST:
+            self.direction = self.SOUTH
 
     def _cmd_r(self):
-        pass
+        if self.direction == self.NORTH:
+            self.direction = self.EAST
+            return
+        if self.direction == self.SOUTH:
+            self.direction = self.WEST
+            return
+        if self.direction == self.EAST:
+            self.direction = self.SOUTH
+            return
+        if self.direction == self.WEST:
+            self.direction = self.NORTH
 
     def run_commands(self, string_buffer):
         commands = self._parse_commands(string_buffer)
