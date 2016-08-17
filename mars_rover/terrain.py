@@ -21,4 +21,3 @@ class Terrain():
 
     def is_clear(self, coord):
         return not bool(self.terrain[coord[0]][coord[1]])
-

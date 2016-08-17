@@ -1,5 +1,6 @@
 from exceptions import ObstacleBlocking
 
+
 FORWARD = 'f'
 BACKWARD = 'b'
 LEFT = 'l'
@@ -19,6 +20,16 @@ class Rover(object):
     WEST = 'W'
 
     def __init__(self, terrain, location, direction):
+        """
+        Init a rover object.
+
+        :type terrain: mars_rover.Terrian
+        :param location: current location as coordinate
+        :type location: tuple
+        :param direction: direction rover is facing
+        :type direction: constant string
+        :return:
+        """
         self.terrain = terrain
         self.x, self.y = location
         self.direction = direction
@@ -38,19 +49,7 @@ class Rover(object):
         if not self.terrain.is_clear(location):
                 raise ObstacleBlocking()
 
-    def _cmd_f(self):
-        x = self.x
-        y = self.y
-
-        if self.direction == self.NORTH:
-            x -= 1
-        if self.direction == self.SOUTH:
-            x += 1
-        if self.direction == self.WEST:
-            y -= 1
-        if self.direction == self.EAST:
-            y += 1
-
+    def _move_rover(self, x, y):
         if x < 0:
             x = self.terrain.max_x
         if x > self.terrain.max_x:
@@ -65,6 +64,20 @@ class Rover(object):
         self._check_clear(location)
         self.x, self.y = location
 
+    def _cmd_f(self):
+        x = self.x
+        y = self.y
+
+        if self.direction == self.NORTH:
+            x -= 1
+        if self.direction == self.SOUTH:
+            x += 1
+        if self.direction == self.WEST:
+            y -= 1
+        if self.direction == self.EAST:
+            y += 1
+
+        self._move_rover(x, y)
 
     def _cmd_b(self):
         x = self.x
@@ -79,19 +92,7 @@ class Rover(object):
         if self.direction == self.EAST:
             y -= 1
 
-        if x < 0:
-            x = self.terrain.max_x
-        if x > self.terrain.max_x:
-            x = 0
-
-        if y < 0:
-            y = self.terrain.max_y
-        if y > self.terrain.max_y:
-            y = 0
-
-        location = (x, y)
-        self._check_clear(location)
-        self.x, self.y = location
+        self._move_rover(x, y)
 
     def _cmd_l(self):
         if self.direction == self.NORTH:
@@ -121,6 +122,10 @@ class Rover(object):
 
     @property
     def location(self):
+        """
+        Returns the rovers current location.
+        :rtype: tuple
+        """
         return (self.x, self.y)
 
     def run_commands(self, string_buffer):
